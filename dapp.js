@@ -1,5 +1,3 @@
-
-
 // contract address on Rinkeby:
 const acAddress = '0xA5106f026509EE26BbD4f2d24FfBA6eE4df77A4b'
 
@@ -698,8 +696,7 @@ window.addEventListener('load', function() {
       let mmDetected = document.getElementById('mm-detected')
       mmDetected.innerHTML += 'MetaMask Is Available!'
 
-      // add in web3 here
-      var web3 = new Web3(window.ethereum)
+       
 
     } else {
       console.log('MetaMask is not available')
@@ -717,6 +714,7 @@ window.addEventListener('load', function() {
 
 
 var web3 = new Web3(window.ethereum)
+
 
 // Grabbing the button object,
 
@@ -760,6 +758,9 @@ acadminSubmit.onclick = async () => {
   answerChecker.setProvider(window.ethereum)
 
   await answerChecker.methods.setAnwser(acadminAnswerA, acadminAnswerB, acadminAnswerC).send({from: ethereum.selectedAddress})
+
+
+  
 }
 
 
@@ -784,16 +785,33 @@ acuserSubmit.onclick = async () => {
   // instantiate smart contract instance
 
   const answerChecker = new web3.eth.Contract(acABI, acAddress)
-  answerChecker.setProvider(window.ethereum)
-
-  await answerChecker.methods.userAnswer(acUserAnswerA, acUserAnswerB, acUserAnswerC).send({from: ethereum.selectedAddress})
+  console.log(answerChecker.address)
   
+  const acDisplayanswer = document.getElementById('ac-display-correctanswerresult');
 
+  await answerChecker.methods.userAnswer(acUserAnswerA, acUserAnswerB, acUserAnswerC)
+  .send({from: ethereum.selectedAddress})
+  .on('error', function(error) {
+	console.log(error)
+	acDisplayanswer.innerHTML = 'Answers no submitted, make sure you are using the Rinkeby network and have enough Ether.';	
+
+	}) 
+  .on('receipt', function (receipt) {
+	console.log(receipt)
+	var eventCorrectOutput = receipt.events.CorrectAnswer.returnValues.Result;
+
+	if(eventCorrectOutput == true) {
+		acDisplayanswer.innerHTML = 'Congratulations! You are correct, you can now mint your token if you have not done so already.'
+
+	} else {
+
+	acDisplayanswer.innerHTML = 'You are incorrect, please try again.';
+	}
+  })
 }
 
-
-
 const acuserMint = document.getElementById('ac-usermint-button');
+const medalimage = document.getElementById('medal_holder')
 
 acuserMint.onclick = async () => {
 	
@@ -801,14 +819,39 @@ acuserMint.onclick = async () => {
   
 	const answerChecker = new web3.eth.Contract(acABI, acAddress)
 	answerChecker.setProvider(window.ethereum)
-  
+	const acDisplayMintInfo = document.getElementById('ac-display-mintInfo');
+
 	await answerChecker.methods.mintToken().send({from: ethereum.selectedAddress})
-	await answerChecker.events.TokenMinted().on('data', (event) => {
-		alert('token minted, congratulations!')
-	})
-	.on('error', alert('token not minted, user can only mint one token on correct answer') );
+	.on('receipt',function (receipt) {
+		
+				console.log(receipt)
+				var eventMintedToken = receipt.events.TokenMinted.returnValues.MedalType;
+				var eventAttemptsatMint = receipt.events.TokenMinted.returnValues.Attempts;
+				acDisplayMintInfo.innerHTML = 'Congratulations you now own a ' + eventMintedToken + ' it took you ' + eventAttemptsatMint +' attempts.'
+				var eventMintedToken = receipt.events.TokenMinted.returnValues.MedalType;
+			if(eventMintedToken == 'Gold_Medal') {
+				var medalTypeimg = '<img src="/static/goldmedal.png">';
+				medalimage.innerHTML = medalTypeimg;
+			} else if(eventMintedToken == 'Silver_Medal') {
+				var medalTypeimg = '<img src="/static/silvermedal.png">';
+				medalimage.innerHTML = medalTypeimg;
+			} else if(eventMintedToken == 'Bronze_Medal') {
+				var medalTypeimg = '<img src="/static/bronzemedal.png">';
+				medalimage.innerHTML = medalTypeimg;
+			} else {
+				var medalTypeimg = '<img src="/static/plainmedal.png">';
+				medalimage.innerHTML = medalTypeimg;
+			}
+		
+	  })
+	.on('error', function(error) {
+		console.log(error)
+		acDisplayMintInfo.innerHTML = 'Token not minted, you can only mint one token after getting the questions correct.';	
+
+		})
 	
   }
+
 
 
 
@@ -850,6 +893,5 @@ acGetStats.onclick = async () => {
   const acDisplayuserattempts = document.getElementById('ac-display-userattempts')
   acDisplayuserattempts.innerHTML = 'User Attempts: ' + checkuserAttempts
 
-
-
 }
+
