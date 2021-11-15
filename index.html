@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simple Answer Checker (Basic Visuals)</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-  
+  <link rel="stylesheet" href="dapp.css">
 
 </head>
 <body>
@@ -42,7 +42,7 @@
   <input id="ac-user-answer-A" type="string" placeholder="Provide Answer A"/> 
   <h3>What is the smallest unit of Ether called?</h3> 
   <input id="ac-user-answer-B" type="string" placeholder="Provide Answer B"/>  
-  <h3>What is the last name of the Russian-Canadian founder of Ethereum/?</h3>
+  <h3>What is the last name of the Russian-Canadian founder of Ethereum?</h3>
   <input id="ac-user-answer-C" type="string" placeholder="Provide Answer C"/>  
 
 </div>
@@ -51,7 +51,14 @@
 <button id="ac-userinput-button">Submit Answers</button>
 <br> 
 <br>
+<div id="ac-display-correctanswerresult"></div>
+<br> 
+<br>
 <button id="ac-usermint-button">Mint Token</button>
+<br> 
+<br>
+<div id="ac-display-mintInfo" > </div>
+<div id="medal_holder" class="portrait"></div>
 <br> 
 <br>
   <div>
